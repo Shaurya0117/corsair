@@ -4,10 +4,14 @@ import { z } from 'zod';
 export const JobSchema = z.object({
 	id: z.string(),
 	status: z.string().optional(),
-	created_on: z.string().optional(),
-	completed_on: z.string().optional(),
+	created_on: z.string().nullable().optional(),
+	completed_on: z.string().nullable().optional(),
 	name: z.string().optional(),
 	type: z.string().optional(),
+	metadata: z.string().nullable().optional(),
+	language: z.string().nullable().optional(),
+	failure: z.string().nullable().optional(),
+	duration_seconds: z.number().nullable().optional(),
 });
 
 export const SubmitJobInputSchema = z.object({
@@ -29,7 +33,7 @@ export type SubmitJobInput = z.infer<typeof SubmitJobInputSchema>;
 export type GetJobInput = z.infer<typeof GetJobInputSchema>;
 export type GetTranscriptInput = z.infer<typeof GetTranscriptInputSchema>;
 export type JobResponse = z.infer<typeof JobSchema>;
-export type TranscriptResponse = any;
+export type TranscriptResponse = any; // Will be typed based on requested format
 
 export type RevAIEndpointInputs = {
 	submitJob: SubmitJobInput;
@@ -52,5 +56,5 @@ export const RevAIEndpointInputSchemas = {
 export const RevAIEndpointOutputSchemas = {
 	submitJob: JobSchema,
 	getJob: JobSchema,
-	getTranscript: z.any(),
+	getTranscript: z.union([z.record(z.any()), z.string()]),
 } as const;

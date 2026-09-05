@@ -49,10 +49,19 @@ export function createRevAIMatch(eventType: string): CorsairWebhookMatcher {
 	};
 }
 
+import crypto from 'crypto';
 export function verifyRevAIWebhookSignature(
 	request: WebhookRequest<RevAIWebhookPayload>,
 	secret: string,
 ): { valid: boolean; error?: string } {
-	// TODO: Implement webhook signature verification
-	return { valid: true };
+	if (request.hubVerified) return { valid: true };
+	const signature = request.headers['x-revai-signature'];
+	if (!signature || typeof signature !== 'string') return { valid: false, error: 'Missing signature' };
+	try {
+		const hmac = crypto.createHmac('sha256', secret).update(request.body).digest('hex');
+		const expected = crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(signature));
+		return expected ? { valid: true } : { valid: false, error: 'Invalid signature' };
+	} catch (err) {
+		return { valid: false, error: 'Signature verification failed' };
+	}
 }
