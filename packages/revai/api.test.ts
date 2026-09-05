@@ -1,5 +1,5 @@
-import { submitJob, getJob, getTranscript } from './endpoints/jobs';
 import * as client from './client';
+import { getJob, getTranscript, submitJob } from './endpoints/jobs';
 
 jest.mock('./client');
 
@@ -20,7 +20,11 @@ describe('Rev AI Endpoints', () => {
 	it('submitJob serializes media_url to source_config.url', async () => {
 		(client.makeRevAIRequest as jest.Mock).mockResolvedValue({ id: '123' });
 
-		await submitJob(mockCtx, { media_url: 'https://test.com/audio.mp3', metadata: 'test', language: 'en' });
+		await submitJob(mockCtx, {
+			media_url: 'https://test.com/audio.mp3',
+			metadata: 'test',
+			language: 'en',
+		});
 
 		expect(client.makeRevAIRequest).toHaveBeenCalledWith(
 			'/jobs',
@@ -32,7 +36,7 @@ describe('Rev AI Endpoints', () => {
 					metadata: 'test',
 					language: 'en',
 				},
-			})
+			}),
 		);
 	});
 
@@ -44,14 +48,17 @@ describe('Rev AI Endpoints', () => {
 		expect(client.makeRevAIRequest).toHaveBeenCalledWith(
 			`/jobs/${encodeURIComponent('some/id?with=params')}`,
 			'test_token',
-			expect.objectContaining({ method: 'GET' })
+			expect.objectContaining({ method: 'GET' }),
 		);
 	});
 
 	it('getTranscript encodes the job ID and adds accept header', async () => {
 		(client.makeRevAIRequest as jest.Mock).mockResolvedValue({});
 
-		await getTranscript(mockCtx, { id: 'some/id?with=params', accept: 'text/plain' });
+		await getTranscript(mockCtx, {
+			id: 'some/id?with=params',
+			accept: 'text/plain',
+		});
 
 		expect(client.makeRevAIRequest).toHaveBeenCalledWith(
 			`/jobs/${encodeURIComponent('some/id?with=params')}/transcript`,
@@ -59,7 +66,7 @@ describe('Rev AI Endpoints', () => {
 			expect.objectContaining({
 				method: 'GET',
 				headers: { Accept: 'text/plain' },
-			})
+			}),
 		);
 	});
 });

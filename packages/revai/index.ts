@@ -1,4 +1,5 @@
 import type {
+	AuthTypes,
 	BindEndpoints,
 	BindWebhooks,
 	CorsairEndpoint,
@@ -14,20 +15,22 @@ import type {
 	RequiredPluginEndpointSchemas,
 	RequiredPluginWebhookSchemas,
 } from 'corsair/core';
-import type { AuthTypes } from 'corsair/core';
-import type { RevAIEndpointInputs, RevAIEndpointOutputs } from './endpoints/types';
-import { RevAIEndpointInputSchemas, RevAIEndpointOutputSchemas } from './endpoints/types';
-import type {
-	RevAIWebhookOutputs,
-	ExampleEvent,
-} from './webhooks/types';
-import { ExampleEventSchema } from './webhooks/types';
 import { Jobs } from './endpoints';
+import type {
+	RevAIEndpointInputs,
+	RevAIEndpointOutputs,
+} from './endpoints/types';
+import {
+	RevAIEndpointInputSchemas,
+	RevAIEndpointOutputSchemas,
+} from './endpoints/types';
+import { errorHandlers } from './error-handlers';
 import { RevAISchema } from './schema';
 import { ExampleWebhooks } from './webhooks';
-import { errorHandlers } from './error-handlers';
-import { matchRevAITenantWebhook } from './webhooks/tenant-matcher';
 import { resolveRevAIOAuthWebhookTenantLink } from './webhooks/oauth-tenant-link';
+import { matchRevAITenantWebhook } from './webhooks/tenant-matcher';
+import type { ExampleEvent, RevAIWebhookOutputs } from './webhooks/types';
+import { ExampleEventSchema } from './webhooks/types';
 
 export type RevAIPluginOptions = {
 	authType?: PickAuth<'api_key' | 'oauth_2'>;
@@ -48,9 +51,7 @@ export type RevAIKeyBuilderContext = KeyBuilderContext<RevAIPluginOptions>;
 
 export type RevAIBoundEndpoints = BindEndpoints<typeof revAIEndpointsNested>;
 
-type RevAIEndpoint<
-	K extends keyof RevAIEndpointOutputs,
-> = CorsairEndpoint<
+type RevAIEndpoint<K extends keyof RevAIEndpointOutputs> = CorsairEndpoint<
 	RevAIContext,
 	RevAIEndpointInputs[K],
 	RevAIEndpointOutputs[K]
@@ -62,10 +63,11 @@ export type RevAIEndpoints = {
 	getTranscript: RevAIEndpoint<'getTranscript'>;
 };
 
-type RevAIWebhook<
-	K extends keyof RevAIWebhookOutputs,
+type RevAIWebhook<K extends keyof RevAIWebhookOutputs, TEvent> = CorsairWebhook<
+	RevAIContext,
 	TEvent,
-> = CorsairWebhook<RevAIContext, TEvent, RevAIWebhookOutputs[K]>;
+	RevAIWebhookOutputs[K]
+>;
 
 export type RevAIWebhooks = {
 	example: RevAIWebhook<'example', ExampleEvent>;
@@ -206,12 +208,15 @@ export function revai<const T extends RevAIPluginOptions>(
 }
 
 export type {
+	GetJobInput,
+	GetTranscriptInput,
+	JobResponse,
+	RevAIEndpointInputs,
+	RevAIEndpointOutputs,
+	SubmitJobInput,
+	TranscriptResponse,
+} from './endpoints/types';
+export type {
 	ExampleEvent,
 	RevAIWebhookOutputs,
 } from './webhooks/types';
-
-export type {
-	RevAIEndpointInputs,
-	RevAIEndpointOutputs,
-	SubmitJobInput, GetJobInput, GetTranscriptInput, JobResponse, TranscriptResponse,
-} from './endpoints/types';

@@ -1,5 +1,4 @@
-import type { ApiRequestOptions } from 'corsair/http';
-import type { OpenAPIConfig } from 'corsair/http';
+import type { ApiRequestOptions, OpenAPIConfig } from 'corsair/http';
 import { request } from 'corsair/http';
 
 export class RevAIAPIError extends Error {
@@ -35,8 +34,8 @@ export async function makeRevAIRequest<T>(
 		TOKEN: apiKey,
 		HEADERS: {
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${apiKey}`,
-			...(options.headers || {})
+			Authorization: `Bearer ${apiKey}`,
+			...(options.headers || {}),
 		},
 	};
 

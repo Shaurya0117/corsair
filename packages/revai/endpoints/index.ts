@@ -1,10 +1,9 @@
-
-import { submitJob, getJob, getTranscript } from './jobs';
+import { getJob, getTranscript, submitJob } from './jobs';
 
 export const Jobs = {
 	submitJob,
-    getJob,
-    getTranscript,
+	getJob,
+	getTranscript,
 };
 
 export * from './types';

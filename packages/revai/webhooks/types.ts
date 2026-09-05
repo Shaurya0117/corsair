@@ -1,4 +1,8 @@
-import type { CorsairWebhookMatcher, RawWebhookRequest, WebhookRequest } from 'corsair/core';
+import type {
+	CorsairWebhookMatcher,
+	RawWebhookRequest,
+	WebhookRequest,
+} from 'corsair/core';
 import { z } from 'zod';
 
 export const RevAIWebhookPayloadSchema = z.object({
@@ -7,9 +11,7 @@ export const RevAIWebhookPayloadSchema = z.object({
 	data: z.record(z.string(), z.unknown()),
 });
 
-export type RevAIWebhookPayload = z.infer<
-	typeof RevAIWebhookPayloadSchema
->;
+export type RevAIWebhookPayload = z.infer<typeof RevAIWebhookPayloadSchema>;
 
 export const ExampleEventSchema = RevAIWebhookPayloadSchema.extend({
 	type: z.literal('example'),
@@ -30,7 +32,9 @@ function parseBody(body: unknown): Record<string, unknown> | null {
 	if (typeof body === 'string') {
 		try {
 			const parsed = JSON.parse(body);
-			return parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)
+			return parsed !== null &&
+				typeof parsed === 'object' &&
+				!Array.isArray(parsed)
 				? (parsed as Record<string, unknown>)
 				: null;
 		} catch {
@@ -56,11 +60,20 @@ export function verifyRevAIWebhookSignature(
 ): { valid: boolean; error?: string } {
 	if (request.hubVerified) return { valid: true };
 	const signature = request.headers['x-revai-signature'];
-	if (!signature || typeof signature !== 'string') return { valid: false, error: 'Missing signature' };
+	if (!signature || typeof signature !== 'string')
+		return { valid: false, error: 'Missing signature' };
 	try {
-		const hmac = crypto.createHmac('sha256', secret).update(request.body).digest('hex');
-		const expected = crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(signature));
-		return expected ? { valid: true } : { valid: false, error: 'Invalid signature' };
+		const hmac = crypto
+			.createHmac('sha256', secret)
+			.update(request.body)
+			.digest('hex');
+		const expected = crypto.timingSafeEqual(
+			Buffer.from(hmac),
+			Buffer.from(signature),
+		);
+		return expected
+			? { valid: true }
+			: { valid: false, error: 'Invalid signature' };
 	} catch (err) {
 		return { valid: false, error: 'Signature verification failed' };
 	}

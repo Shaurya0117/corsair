@@ -1,4 +1,3 @@
-
 import { z } from 'zod';
 
 export const JobSchema = z.object({
@@ -26,7 +25,9 @@ export const GetJobInputSchema = z.object({
 
 export const GetTranscriptInputSchema = z.object({
 	id: z.string(),
-	accept: z.enum(['application/vnd.rev.transcript.v1.0+json', 'text/plain']).default('application/vnd.rev.transcript.v1.0+json'),
+	accept: z
+		.enum(['application/vnd.rev.transcript.v1.0+json', 'text/plain'])
+		.default('application/vnd.rev.transcript.v1.0+json'),
 });
 
 export type SubmitJobInput = z.infer<typeof SubmitJobInputSchema>;

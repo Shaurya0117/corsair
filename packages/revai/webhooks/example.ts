@@ -20,7 +20,12 @@ export const example: RevAIWebhooks['example'] = {
 			return { success: true, data: undefined };
 		}
 
-		await logEventFromContext(ctx, 'revai.webhook.example', { ...event }, 'completed');
+		await logEventFromContext(
+			ctx,
+			'revai.webhook.example',
+			{ ...event },
+			'completed',
+		);
 
 		return { success: true, data: event };
 	},
