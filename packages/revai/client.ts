@@ -53,6 +53,13 @@ export async function makeRevAIRequest<T>(
 	try {
 		return await request<T>(config, requestOptions);
 	} catch (error) {
+		if (
+			error &&
+			typeof error === 'object' &&
+			error.constructor.name === 'ApiError'
+		) {
+			throw error;
+		}
 		if (error instanceof Error) {
 			throw new RevAIAPIError(error.message);
 		}
