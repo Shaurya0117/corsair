@@ -13,6 +13,7 @@ export const submitJob: RevAIEndpoints['submitJob'] = async (ctx, input) => {
 				source_config: { url: input.media_url },
 				metadata: input.metadata,
 				language: input.language,
+				notification_config: input.notification_config,
 			},
 		},
 	);

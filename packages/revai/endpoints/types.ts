@@ -17,6 +17,16 @@ export const SubmitJobInputSchema = z.object({
 	media_url: z.string().url(),
 	metadata: z.string().optional(),
 	language: z.string().optional(),
+	notification_config: z
+		.object({
+			url: z.string().url(),
+			auth_headers: z
+				.object({
+					Authorization: z.string(),
+				})
+				.optional(),
+		})
+		.optional(),
 });
 
 export const GetJobInputSchema = z.object({

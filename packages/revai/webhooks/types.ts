@@ -53,30 +53,19 @@ export function createRevAIMatch(eventType: string): CorsairWebhookMatcher {
 	};
 }
 
-import crypto from 'crypto';
 export function verifyRevAIWebhookSignature(
 	request: WebhookRequest<RevAIWebhookPayload> | RawWebhookRequest,
 	secret: string,
 ): { valid: boolean; error?: string } {
 	if ('hubVerified' in request && request.hubVerified) return { valid: true };
-	const signature = request.headers['x-revai-signature'];
-	if (!signature || typeof signature !== 'string')
-		return { valid: false, error: 'Missing signature' };
-	try {
-		const rawBody =
-			'rawBody' in request ? request.rawBody : (request as any).body;
-		const hmac = crypto
-			.createHmac('sha256', secret)
-			.update(rawBody || '')
-			.digest('hex');
-		const expected = crypto.timingSafeEqual(
-			Buffer.from(hmac),
-			Buffer.from(signature),
-		);
-		return expected
-			? { valid: true }
-			: { valid: false, error: 'Invalid signature' };
-	} catch (err) {
-		return { valid: false, error: 'Signature verification failed' };
+	let authHeader = request.headers['authorization'];
+	if (Array.isArray(authHeader)) authHeader = authHeader[0];
+	if (!authHeader || typeof authHeader !== 'string')
+		return { valid: false, error: 'Missing Authorization header' };
+
+	const token = authHeader.replace(/^Bearer\s+/i, '');
+	if (token === secret) {
+		return { valid: true };
 	}
+	return { valid: false, error: 'Invalid token' };
 }
