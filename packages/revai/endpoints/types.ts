@@ -57,5 +57,5 @@ export const RevAIEndpointInputSchemas = {
 export const RevAIEndpointOutputSchemas = {
 	submitJob: JobSchema,
 	getJob: JobSchema,
-	getTranscript: z.union([z.record(z.any()), z.string()]),
+	getTranscript: z.union([z.record(z.string(), z.any()), z.string()]),
 } as const;
